@@ -1,6 +1,8 @@
 #include "defcommon.c"
 #include "defserveur.c"
 
+
+
 int	main(void)
 {
 //PREPARATION DE L ENVIRONNEMENT
@@ -17,7 +19,7 @@ int	main(void)
 //	int msqid2;
 //	msqid2 = msgrcv(msqid,&msgtxt,255,(long)12,0);
 //	msgtxt.mtext[x] = 0;
-//	printf("attente...\n %s \n", msgtxt.mtext);
+//	printf("attente...s\n %s \n", msgtxt.mtext);
 //Création des spectacles
 	createShow();
 	pthread_t	leger_consult;
@@ -25,26 +27,39 @@ int	main(void)
 	signal(SIGINT, (__sighandler_t) sortieImminente);
 	initVerrous();
 	printf("A l'ecoute..\n");
+	
 	//INTERFACES DEMARRAGE
 	//displayAllShow();
 		
 	while(1){
+	//connexion entrante
+//	if(msgrcv(msqid,&msgtxt,sizeof(msgbuf)-sizeof(long),(long)10,0)!=-1)
+//	{
+//		printf("%s\n",msgtxt.mtext);
+//	}
+//	else
+//	{
+//		printf("Erreur\n");
+//	}
+	//consultation
 	
 	//GESTION RECEPTION REQUETE
 	if(msgrcv(msqid,&msgtxt,sizeof(msgbuf)-sizeof(long),(long)14,0)!=-1)
 		{
 			printf("%s\n",msgtxt.mtext);
 			
-	
-			//verrou if not verrouille suite sinon reservation deja en cours et faire file d attente.
-			//msgtxt.mtype = 15;
-			//creer un pthread
-			pthread_create(&leger_consult,NULL,(void*(*)())reservation,NULL);
-			
-	
+			while(tache.sem_op == -1)
+			{
+			//verrou if not verrouille suite sinon reservation deja en cours et faire file d attente.		
+			printf("verouille\n");
+			//wait pid
+			}
+				pthread_create(&leger_consult,NULL,(void*(*)())reservation,NULL);
 		}else{
 			perror("msgrcv error");	
 		}
+	//RESERVATION FORK
+		
 			//Verrou
 			//New thread qui traite la reservation et renvoie
 

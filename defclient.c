@@ -27,7 +27,7 @@ int starting()
 			sleep(2);
 			return -1;
 	}
-	return 0;
+	return -1;
 	
 }
 
@@ -66,3 +66,23 @@ int reservationNbPlace()
 	return number;
 }
 
+int chooseAction()
+{
+	int choice;
+	printf("\n What do you want to do? \n 1: Look at shows \n 2: Book a show \n 3: Quit \n ");
+	scanf("%d", &choice);
+	switch(choice){
+		case 1 :
+			sleep(1);
+			return choice;
+		case 2 :
+			sleep(1);
+			return choice;
+		case 3 :
+			printf("See you soon !\n");
+			sleep(1);
+			return choice;	
+	}
+	
+	return -1;
+}

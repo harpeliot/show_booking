@@ -24,6 +24,7 @@ void lock()
 	tache.sem_op = -1;
 	tache.sem_flg = 0;
 	semop(semid,&tache,1);
+	printf("Verrouillé\n");
 }
 
 void unlock()
@@ -32,8 +33,8 @@ void unlock()
 	tache.sem_op = 1;
 	tache.sem_flg = 0;
 	semop(semid,&tache,1);
+	printf("déverrouillage\n");
 }
-
 
 int getRepresentationNumber(char title[])
 {
@@ -50,13 +51,16 @@ int getRepresentationNumber(char title[])
 
 int makeReservation(short id, short nbPlaces)
 {
+	sleep(3);
 	if(tabS[id].left_places >= nbPlaces)
 	{
+		lock();
 		tabS[id].left_places -= nbPlaces;
 		if(tabS[id].left_places == 0)
 		{
 			printf("Ce sont les dernières places !\n");
 		}
+		unlock();
 		return 1;
 	}
 	else
@@ -129,24 +133,24 @@ void createShow()
 	newSpectacle("Elton",90);
 }
 
-
-
 void consultation()
 {
 	while(1)
 	{
 		if(msgrcv(msqid,&msgtxt,sizeof(msgbuf)-sizeof(long),(long)12,0)!=-1)
-		{
+		{	
+			lock();
 			printf("%s\n",msgtxt.mtext);
 			msgtxt.mtype=13;
 			for(int i=0;i<11;i++)
 			{
 				msgtxt.tab[i]=tabS[i];
 			}
-			printf( "consultation\n");
+			unlock();
+			printf( "consultation envoyee\n");
 			//strcpy(msgtxt.mtext,msg);
 			//if si pas error
-			msgsnd(msqid, &msgtxt,  sizeof(msgbuf)-sizeof(long), 0);
+			msgsnd(msqid, &msgtxt, sizeof(msgbuf)-sizeof(long), 0);
 		}else
 		{
 			perror("msgrcv");
@@ -162,24 +166,19 @@ void reservation()
 	if(msgrcv(msqid,&msgtxt,sizeof(msgbuf)-sizeof(long),(long)16,0)!=-1)
 	{
 		printf("reservation\n");
-		//Poser verrou
-		lock();
 		if(1 == makeReservation(msgtxt.idReservation,msgtxt.nbReservation))
 		{
-			msg = "Booking confirmed\n";
+			msg = "Booking confirmed\nSee you soon !\n";
 		}else
 		{
-			msg = "The booking is sold out";
+			msg = "The booking is sold out\nSee you soon !\n";
 		}
 		strcpy(msgtxt.mtext,msg);
 		msgtxt.mtype=17;
-		//Enlever verrou
-		unlock();
 		msgsnd(msqid, &msgtxt,  sizeof(msgbuf)-sizeof(long), 0);
 		pthread_exit(NULL);
 	}
 }
-
 
 //Non utilisé
 //void * displayAllShow()

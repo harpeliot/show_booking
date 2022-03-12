@@ -10,6 +10,8 @@
 #include <sys/msg.h>
 #include <sys/sem.h>
 #define KEY 42
+#define true 1
+#define false 0
 
 typedef struct Spectacle Spectacle;
 
